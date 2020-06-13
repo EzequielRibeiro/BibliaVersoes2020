@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "558421695014",
+    "firebase_url": "https://bibliaversoes-98c90.firebaseio.com",
+    "project_id": "bibliaversoes-98c90",
+    "storage_bucket": "bibliaversoes-98c90.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:558421695014:android:500015f6081fd1d0",
+        "android_client_info": {
+          "package_name": "com.projeto.biblianvi.BibliaVersoes"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "558421695014-chpt1ou3m7g3ln16f3042tun9tjsqc0u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.projeto.biblianvi.BibliaVersoes",
+            "certificate_hash": "6b3cd09f52a7af8c115ceeaf7d695d81d6978ea4"
+          }
+        },
+        {
+          "client_id": "558421695014-n4fk3v59nsr65ogbbpafcdv7rs9ldh4g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPOPqN9lslQOXa83bYfpJa2rx4wpudG3g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "558421695014-n4fk3v59nsr65ogbbpafcdv7rs9ldh4g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      },
+      "admob_app_id": "ca-app-pub-0822808376839371~7656850482"
+    }
+  ],
+  "configuration_version": "1"
+}
