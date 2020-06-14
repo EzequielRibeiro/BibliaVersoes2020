@@ -230,7 +230,7 @@ public class Activity_busca_avancada extends Activity {
         private ProgressBar progressBarSearch;
         private FrameLayout frameLayout;
         private List<Biblia> lista;
-        private LinearLayout linearLayout;
+        private LinearLayout linearLayout,linearLayoutBusca;
 
         public PesquisarBanco(Context context) {
 
@@ -316,6 +316,7 @@ public class Activity_busca_avancada extends Activity {
 
             frameLayout.addView(linearLayout);
             progressBarSearch.setVisibility(View.GONE);
+            linearLayoutBusca.setVisibility(View.VISIBLE);
 
 
         }
@@ -324,6 +325,8 @@ public class Activity_busca_avancada extends Activity {
         @Override
         protected void onPreExecute() {
 
+            linearLayoutBusca = findViewById(R.id.linearLayoutBusca);
+            linearLayoutBusca.setVisibility(View.INVISIBLE);
             frameLayout = findViewById(R.id.framelayoutBuscar);
             FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) frameLayout.getLayoutParams();
             params.height = LinearLayout.LayoutParams.WRAP_CONTENT;
@@ -334,9 +337,6 @@ public class Activity_busca_avancada extends Activity {
             progressBarSearch.setLayoutParams(params);
             progressBarSearch.setVisibility(View.VISIBLE);
             frameLayout.addView(progressBarSearch);
-
-
-
         }
 
         protected void onProgressUpdate(Integer... values) {

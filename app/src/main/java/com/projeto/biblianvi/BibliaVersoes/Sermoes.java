@@ -30,10 +30,6 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-
 
 import java.util.Locale;
 
@@ -109,10 +105,6 @@ public class Sermoes extends Activity {
     protected void onResume() {
         super.onResume();
 
-        //requestNewInterstitial();
-        propaganda();
-
-
     }
 
     @Override
@@ -170,64 +162,6 @@ public class Sermoes extends Activity {
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null;
     }
-
-
-    private void propaganda() {
-
-
-        LinearLayout myLayoutBase = findViewById(R.id.linearMobDevo);
-
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) myLayoutBase.getLayoutParams();
-
-        AdView mAdView = findViewById(R.id.adViewBrowser);
-
-        if (isNetworkAvailable() && (mAdView != null)) {
-
-            params.height = LinearLayout.LayoutParams.WRAP_CONTENT;
-
-            mAdView.setAdListener(new AdListener() {
-
-                public void onAdFailedToLoad(int errorCode) {
-
-                    switch (errorCode) {
-
-                        case AdRequest.ERROR_CODE_INTERNAL_ERROR:
-                            Log.e("ADMOB ERRO:", "ERROR_CODE_INTERNAL_ERROR");
-                            break;
-                        case AdRequest.ERROR_CODE_INVALID_REQUEST:
-                            Log.e("ADMOB ERRO:", "ERROR_CODE_INVALID_REQUEST");
-                            break;
-                        case AdRequest.ERROR_CODE_NETWORK_ERROR:
-                            Log.e("ADMOB ERRO:", "ERROR_CODE_NETWORK_ERROR");
-                            break;
-                        case AdRequest.ERROR_CODE_NO_FILL:
-                            Log.e("ADMOB ERRO:", "ERROR_CODE_NO_FILL");
-                            break;
-                        default:
-                            Log.e("ADMOB ERRO:", "NENHUM_ERRO");
-                            break;
-                    }
-                }
-
-            });
-
-
-            //propaganda Google
-            AdRequest adRequest = new AdRequest.Builder().build();
-            mAdView.loadAd(adRequest);
-
-        } else {
-
-            myLayoutBase.setBackgroundResource(R.drawable.banner_logo);
-            //params.height = 0;
-
-
-        }
-
-
-    }
-
-
     PopupWindow pwindo;
     View layoutPop;
 

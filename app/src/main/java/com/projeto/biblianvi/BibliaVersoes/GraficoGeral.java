@@ -14,8 +14,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TextView;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 
 
 public class GraficoGeral extends TabActivity {
@@ -23,7 +21,7 @@ public class GraficoGeral extends TabActivity {
 
     private static final int QUANT_VERSOS = 31062;
     private TextView textViewTotalLido;
-    private AdView mAdView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,36 +56,12 @@ public class GraficoGeral extends TabActivity {
         //set Windows tab as default (zero based)
         tabHost.setCurrentTab(2);
 
-        mAdView = findViewById(R.id.adViewGraf);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
 
 
     }
 
     protected  void onResume(){
         super.onResume();
-
-        LinearLayout myLayoutBase = findViewById(R.id.linearLayoutGrafAd);
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) myLayoutBase.getLayoutParams();
-
-        if(isNetworkAvailable()){
-
-            params.height = LinearLayout.LayoutParams.WRAP_CONTENT;
-
-            //propaganda Google
-            AdView mAdView = findViewById(R.id.adViewGraf);
-            if(mAdView != null){
-                AdRequest adRequest = new AdRequest.Builder().build();
-                mAdView.loadAd(adRequest);}
-            else{Log.e("Erro Admob", "Tela Gráfico");}
-
-
-        }else{
-
-           //  params.height = 0;
-
-        }
 
         textViewTotalLido.setText(String.format("%.2f", quantVersosLidos(getApplicationContext())) + "%");
 
@@ -110,9 +84,6 @@ public class GraficoGeral extends TabActivity {
 
     protected void onPause(){
 
-        if (mAdView != null) {
-            mAdView.pause();
-        }
         super.onPause();
     }
 
@@ -134,9 +105,7 @@ public class GraficoGeral extends TabActivity {
 
     @Override
     public void onDestroy() {
-        if (mAdView != null) {
-            mAdView.destroy();
-        }
+
         super.onDestroy();
     }
 

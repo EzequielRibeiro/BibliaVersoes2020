@@ -34,10 +34,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
 import org.xmlpull.v1.XmlPullParserException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -71,8 +67,6 @@ public class NetworkActivityDevocional extends Activity {
     private NetworkReceiver receiver = new NetworkReceiver();
 
     private ImageView ref;
-
-    private InterstitialAd mInterstitialAd;
 
     WebView myWebView;
 
@@ -194,35 +188,9 @@ public class NetworkActivityDevocional extends Activity {
     }
 
     public void onBackPressed() {
-
-
-
-        if(mInterstitialAd != null)
-            if (mInterstitialAd.isLoaded()) {
-                mInterstitialAd.show();
-            }
-
         finish();
         return;
     }
-
-
-    private void requestNewInterstitial() {
-
-
-        String id = getResources().getString(R.string.interstitial_ad_unit_id);
-
-        mInterstitialAd = new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId(id);
-
-
-        AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                .build();
-
-        mInterstitialAd.loadAd(adRequest);
-    }
-
     protected  void onStop(){
         super.onStop();
 
@@ -238,9 +206,6 @@ public class NetworkActivityDevocional extends Activity {
 
     protected void onResume(){
         super.onResume();
-
-        //requestNewInterstitial();
-        propaganda();
 
 
     }
@@ -281,62 +246,6 @@ public class NetworkActivityDevocional extends Activity {
 
     }
 
-
-
-    private void propaganda() {
-
-
-        LinearLayout myLayoutBase = findViewById(R.id.linearMobDevo);
-
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) myLayoutBase.getLayoutParams();
-
-        AdView mAdView = findViewById(R.id.adViewBrowser);
-
-        if(isNetworkAvailable() && (mAdView != null)){
-
-            params.height = LinearLayout.LayoutParams.WRAP_CONTENT;
-
-            mAdView.setAdListener(new AdListener() {
-
-                public void onAdFailedToLoad(int errorCode) {
-
-                    switch (errorCode) {
-
-                        case AdRequest.ERROR_CODE_INTERNAL_ERROR:
-                            Log.e("ADMOB ERRO:","ERROR_CODE_INTERNAL_ERROR");
-                            break;
-                        case AdRequest.ERROR_CODE_INVALID_REQUEST:
-                            Log.e("ADMOB ERRO:","ERROR_CODE_INVALID_REQUEST");
-                            break;
-                        case AdRequest.ERROR_CODE_NETWORK_ERROR:
-                            Log.e("ADMOB ERRO:","ERROR_CODE_NETWORK_ERROR");
-                            break;
-                        case AdRequest.ERROR_CODE_NO_FILL:
-                            Log.e("ADMOB ERRO:","ERROR_CODE_NO_FILL");
-                            break;
-                        default:
-                            Log.e("ADMOB ERRO:","NENHUM_ERRO");
-                            break;
-                    }
-                }
-
-            });
-
-
-            //propaganda Google
-            AdRequest adRequest = new AdRequest.Builder().build();
-            mAdView.loadAd(adRequest);
-
-        }else{
-
-              myLayoutBase.setBackgroundResource(R.drawable.banner_logo);
-            //params.height = 0;
-
-
-        }
-
-
-    }
 
 
     private boolean isNetworkAvailable() {

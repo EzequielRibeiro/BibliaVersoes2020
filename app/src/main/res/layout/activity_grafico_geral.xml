@@ -21,18 +21,7 @@
         android:layout_height="wrap_content"
         android:background="@android:color/black"
         android:gravity="center|center_horizontal"
-        android:orientation="horizontal">
-
-        <com.google.android.gms.ads.AdView
-            android:id="@+id/adViewGraf"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center|center_horizontal"
-            ads:adSize="BANNER"
-            ads:adUnitId="@string/idMob"></com.google.android.gms.ads.AdView>
-
-
-    </LinearLayout>
+        android:orientation="horizontal"/>
 
     <TabHost
         android:id="@android:id/tabhost"

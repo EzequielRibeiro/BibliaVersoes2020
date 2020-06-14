@@ -11,15 +11,13 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import androidx.annotation.RequiresApi;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 
 
 public class ActivityBrowser extends Activity {
 
     private WebView myWebView;
     private String url;
-    private AdView mAdView;
+
     private Intent intent;
 
     @Override
@@ -31,15 +29,6 @@ public class ActivityBrowser extends Activity {
         myWebView = findViewById(R.id.webViewBrowser);
         url = intent.getStringExtra("url");
 
-        mAdView = findViewById(R.id.adViewBrowser);
-        final AdRequest adRequest = new AdRequest.Builder().build();
-
-        mAdView.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mAdView.loadAd(adRequest);
-            }
-        }, 500);
         Log.e("url", url);
         webView();
 

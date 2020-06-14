@@ -52,16 +52,12 @@ import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.InterstitialAd;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +66,7 @@ import java.util.Objects;
 
 public class Lista_Biblia extends Activity {
 
-    private InterstitialAd  interstitialAd;
+
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -402,34 +398,7 @@ public class Lista_Biblia extends Activity {
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
         };
-        //  mDrawerLayout.setDrawerListener(mDrawerToggle);
 
-
-        // Create the InterstitialAd and set the adUnitId.
-        interstitialAd = new InterstitialAd(this);
-        // Defined in res/values/strings.xml
-        interstitialAd.setAdUnitId(getString(R.string.interstitial_ad_unit_id));
-
-        interstitialAd.setAdListener(new AdListener() {
-            @Override
-            public void onAdLoaded() {
-                // Code to be executed when an ad finishes loading.
-            }
-
-            @Override
-            public void onAdFailedToLoad(int errorCode) {
-
-                Log.i("Intertitial",String.valueOf(errorCode));
-
-                Bundle bundle = new Bundle();
-                bundle.putString("ERROR",String.valueOf(errorCode));
-                bundle.putString("COUNTRY",getResources().getConfiguration().locale.getDisplayCountry());
-                mFirebaseAnalytics.logEvent("Intertitial",bundle);
-
-
-            }
-
-        });
 
 
         modoNoturno();
@@ -939,28 +908,6 @@ public class Lista_Biblia extends Activity {
     protected void onStart() {
         super.onStart();
 
-        startIntertitialAd();
-
-
-
-    }
-
-    private void showInterstitial() {
-        // Show the ad if it's ready. Otherwise toast and restart the game.
-        if (interstitialAd != null && interstitialAd.isLoaded()) {
-            interstitialAd.show();
-        } else {
-            Log.i("Intertitial","Ad did not load");
-            startIntertitialAd();
-        }
-    }
-
-    private void startIntertitialAd() {
-        // Request a new ad if one isn't already loaded, hide the button, and kick off the timer.
-        if (!interstitialAd.isLoading() && !interstitialAd.isLoaded()) {
-            AdRequest adRequest = new AdRequest.Builder().build();
-            interstitialAd.loadAd(adRequest);
-        }
 
     }
 
@@ -1042,7 +989,7 @@ public class Lista_Biblia extends Activity {
         amanager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
         getSharedPreferences("sound", Activity.MODE_PRIVATE).edit().putBoolean("sound", false).commit();
         buttonSound.setBackgroundResource(R.mipmap.sound_on);
-        showInterstitial();
+
     }
 
     protected void onResume() {

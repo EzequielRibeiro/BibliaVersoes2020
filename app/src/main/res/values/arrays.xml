@@ -57,19 +57,19 @@
     </string-array>
 
     <string-array name="versoes">
-        <item>Almeida Corrigida e Fiel ACF 1994</item>
-        <item>Almeida Revista e Atualizada ARA 1993</item>
-        <item>Almeida Revista e Corrigida ARC 1995</item>
-        <item>Almeida Século XXI AS21 2009</item>
+        <item>Almeida Corrigida e Fiel ACF</item>
+        <item>Almeida Revista e Atualizada ARA</item>
+        <item>Almeida Revista e Corrigida ARC</item>
+        <item>Almeida Século XXI AS21</item>
         <item>Almeida Atualizada JFAA</item>
-        <item>King James Atualizada KJA 1999</item>
+        <item>King James Atualizada KJA</item>
         <item>King James Fiel KJF 1611</item>
-        <item>Nova Almeida Atualizada NAA 2017</item>
-        <item>Nova Bíblia Viva NBV 2007</item>
-        <item>Nova Tradução na Linguagem de Hoje NTLH 1988</item>
-        <item>Nova Versão Internacional NVI 1993</item>
-        <item>Nova Versão Transformadora NVT 2016</item>
-        <item>Tradução Brasileira TB 2010</item>
+        <item>Nova Almeida Atualizada NAA</item>
+        <item>Nova Bíblia Viva NBV</item>
+        <item>Nova Tradução na Linguagem de Hoje NTLH</item>
+        <item>Nova Versão Internacional NVI</item>
+        <item>Nova Versão Transformadora NVT</item>
+        <item>Tradução Brasileira TB</item>
     </string-array>
 
 </resources>
