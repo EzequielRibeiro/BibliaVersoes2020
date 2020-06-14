@@ -13,6 +13,8 @@ import android.net.Uri;
 import androidx.core.app.NotificationCompat;
 import java.text.ParseException;
 
+import static android.content.Context.MODE_PRIVATE;
+
 /**
  * Created by Ezequiel on 25/05/2016.
  */
@@ -28,7 +30,7 @@ public class VersiculoDiario extends BroadcastReceiver{
        this.context = context;
 
         try {
-            if (MainActivity.isDataBaseDownload(context))
+            if (MainActivity.isDataBaseDownload(context,context.getSharedPreferences("DataBase",MODE_PRIVATE).getString("version"," ")))
                 criarNotification();
         } catch (ParseException e) {
             e.printStackTrace();
@@ -44,7 +46,7 @@ public class VersiculoDiario extends BroadcastReceiver{
         SharedPreferences settings ;
 
             bibliaHelp.versDoDiaText();
-            settings = context.getSharedPreferences("versDiaPreference", Activity.MODE_PRIVATE);
+            settings = context.getSharedPreferences("versDiaPreference", MODE_PRIVATE);
             assunto = settings.getString("assunto", "...");
             livro = settings.getString("livroNome", "...");
             cap = settings.getString("capVersDia", "...");

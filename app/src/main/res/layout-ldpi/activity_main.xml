@@ -235,18 +235,36 @@
                 </LinearLayout>
 
 
-                <com.google.android.gms.ads.AdView
-                    android:id="@+id/adView"
+                <LinearLayout
+                    android:id="@+id/linearLayoutChoiceBible"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
-                    ads:adSize="BANNER"
-                    ads:adUnitId="@string/idMob"
+                    android:gravity="center"
+                    android:orientation="horizontal"
                     ads:layout_constraintBottom_toTopOf="@+id/layout_qualificar"
                     ads:layout_constraintEnd_toEndOf="parent"
                     ads:layout_constraintStart_toStartOf="parent"
-                    ads:layout_constraintTop_toBottomOf="@+id/linearLayout5"></com.google.android.gms.ads.AdView>
+                    ads:layout_constraintTop_toBottomOf="@+id/linearLayout5">
+
+                    <TextView
+                        android:id="@+id/textViewTextBibleVersion"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="5dp"
+                        android:layout_weight="1"
+                        android:text="Almeida Corrigida e Fiel ACF 1994"
+                        android:textColor="@color/green"
+                        android:textSize="14sp" />
+
+                    <Button
+                        android:id="@+id/buttonChoiceBibleVersion"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_weight="1"
+                        android:background="@android:drawable/ic_menu_more" />
+                </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/layout_qualificar"
@@ -258,7 +276,7 @@
                     ads:layout_constraintBottom_toTopOf="@+id/linearLayoutBarra"
                     ads:layout_constraintEnd_toEndOf="parent"
                     ads:layout_constraintStart_toStartOf="parent"
-                    ads:layout_constraintTop_toBottomOf="@+id/adView">
+                    ads:layout_constraintTop_toBottomOf="@id/linearLayoutChoiceBible">
 
                     <Button
                         android:id="@+id/button_qualificar"

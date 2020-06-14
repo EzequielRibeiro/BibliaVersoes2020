@@ -50,23 +50,21 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.appcompat.widget.Toolbar;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.core.widget.TextViewCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
+import android.os.Build;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.remoteconfig.BuildConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+
 import java.io.File;
 import java.text.ParseException;
 import java.util.Calendar;
@@ -85,20 +83,19 @@ public class MainActivity extends AppCompatActivity {
     private CharSequence mTitle;
     private String[] menuTitulos;
     private BibliaBancoDadosHelper bibliaHelp;
-    private Button button_sermon, buttonClock, button_biblia, button_dicionario, button_pesquisar;
+    private Button button_sermon, buttonClock, button_biblia, button_dicionario, button_pesquisar, buttonChoiceBibleVersion;
     private ProgressDialog progressDialog;
     private Intent intent;
     private ListView listView;
-    private AdView mAdView;
     private int REQUEST_STORAGE = 200;
     private TextView textViewAssuntoVers;
     private TextView textViewVersDia;
-    private TextView textViewDeveloper, textViewDailyVerse;
+    private TextView textViewDeveloper, textViewDailyVerse, textViewTextBibleVersion;
     private FirebaseAnalytics mFirebaseAnalytics;
     private TextView text_qualificar;
     private LinearLayout layout_qualificar;
     static public String PACKAGENAME;
-    static private SharedPreferences sharedPrefDataBasePatch ;
+    static private SharedPreferences sharedPrefDataBasePatch;
     static private SharedPreferences.Editor editor;
     static public String DATABASENAME;
     private FirebaseRemoteConfig mFirebaseRemoteConfig;
@@ -113,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         getSharedPreferences("brilhoAtual", Activity.MODE_PRIVATE).edit().putInt("brilhoAtualValor", Lista_Biblia.getScreenBrightness(getApplicationContext())).commit();
         PACKAGENAME = getPackageName();
-        sharedPrefDataBasePatch = getSharedPreferences("DataBase",Context.MODE_PRIVATE);
+        sharedPrefDataBasePatch = getSharedPreferences("DataBase", Context.MODE_PRIVATE);
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
         mFirebaseRemoteConfig.setDefaultsAsync(R.xml.remote_config);
@@ -122,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
         menuTitulos = getResources().getStringArray(R.array.menu_array);
         mDrawerLayout = findViewById(R.id.drawer_layout);
         mDrawerList = findViewById(R.id.left_drawer);
+        textViewTextBibleVersion = findViewById(R.id.textViewTextBibleVersion);
         textViewDeveloper = findViewById(R.id.textViewDeveloper);
         textViewDeveloper.setTextColor(getResources().getColor(R.color.dark));
         textViewDeveloper.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
@@ -164,6 +162,7 @@ public class MainActivity extends AppCompatActivity {
         button_biblia = findViewById(R.id.button_biblia);
         button_dicionario = findViewById(R.id.button_dicionario);
         button_pesquisar = findViewById(R.id.button_pesquisar);
+        buttonChoiceBibleVersion = findViewById(R.id.buttonChoiceBibleVersion);
         text_qualificar = findViewById(R.id.text_qualificar);
         text_qualificar.setText(getString(R.string.gostou_do_nosso_app));
         textViewDailyVerse = findViewById(R.id.textViewDailyVerse);
@@ -217,6 +216,13 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        buttonChoiceBibleVersion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectBibleVersion();
+            }
+        });
         /*
         textViewVersDia.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -244,7 +250,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if (isDataBaseDownload(getApplicationContext())) {
+                if (isDataBaseDownload(getApplicationContext(), getSharedPreferences("DataBase", MODE_PRIVATE).getString("version", " "))) {
                     Intent i = new Intent();
                     i.setClass(MainActivity.this, MainActivityFragment.class);
                     i.putExtra("Biblia", "biblia");
@@ -267,70 +273,26 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if (isDataBaseDownload(getApplicationContext())) {
-                    startActivity(new Intent(MainActivity.this,Activity_busca_avancada.class));
+                if (isDataBaseDownload(getApplicationContext(), getSharedPreferences("DataBase", MODE_PRIVATE).getString("version", " "))) {
+                    startActivity(new Intent(MainActivity.this, Activity_busca_avancada.class));
                 }
             }
         });
 
-        // MobileAds.initialize(this, getString(R.string.ADMOB_APP_ID));
-        mAdView = findViewById(R.id.adView);
-        final AdRequest adRequest = new AdRequest.Builder().build();
 
-        mAdView.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // MobileAds.setRequestConfiguration(new RequestConfiguration.Builder().setTestDeviceIds(Collections.singletonList("4CCDC45D57519669CA4C587B6E896BE8")).build());
-                mAdView.loadAd(adRequest);
-            }
-        }, 5000);
-
-        mAdView.setAdListener(new AdListener() {
-
-            @Override
-            public void onAdLoaded() {
-
-            }
-
-            @Override
-            public void onAdFailedToLoad(int errorCode) {
-                // Code to be executed when an ad request fails.
-
-                mAdView.setVisibility(View.GONE);
-
-                int orientation = getResources().getConfiguration().orientation;
-                if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-                    ConstraintLayout constraintLayout = (ConstraintLayout) findViewById(R.id.layout_container);
-                    ConstraintSet constraintSet = new ConstraintSet();
-                    constraintSet.clone(constraintLayout);
-                    constraintSet.connect(R.id.layout_escolha_livro, ConstraintSet.BOTTOM, R.id.layout_qualificar, ConstraintSet.TOP, 0);
-                    constraintSet.applyTo(constraintLayout);
-
-                }
+        //  Bundle bundle = new Bundle();
+        //  bundle.putString("ERRORCODE", String.valueOf(errorCode));
+        //   bundle.putString("COUNTRY", getResources().getConfiguration().locale.getDisplayCountry());
+        //    mFirebaseAnalytics.logEvent("ADMOB", bundle);
 
 
-                // AdRequest.ERROR_CODE_NO_FILL)
-                Log.i("admob", String.valueOf(errorCode));
-                Bundle bundle = new Bundle();
-                bundle.putString("ERRORCODE", String.valueOf(errorCode));
-                bundle.putString("COUNTRY", getResources().getConfiguration().locale.getDisplayCountry());
-                mFirebaseAnalytics.logEvent("ADMOB", bundle);
-
-
-            }
-
-
-        });
-
-        if (isDataBaseDownload(getApplicationContext())) {
+        if (isDataBaseDownload(getApplicationContext(), getSharedPreferences("DataBase", MODE_PRIVATE).getString("version", " "))) {
             textViewDeveloper.setText(getString(R.string.total_lido) + " " +
                     String.format("%.2f", GraficoGeral.quantVersosLidos(getApplicationContext())) + "%");
         } else {
             textViewDeveloper.setText("");
         }
 
-
-        Log.e("Banco:", Boolean.toString(isDataBaseDownload(getApplicationContext())));
 
     }
 
@@ -365,44 +327,112 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void selecBibleVersion(){
+    private void selectBibleVersion() {
+
+        final FrameLayout frameLayout = findViewById(R.id.frame_layout_man);
+        final LinearLayout linearLayout = new LinearLayout(getApplicationContext());
+
+        final Spinner spinner = new Spinner(getApplicationContext());
+        spinner.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        String[] versoes = getResources().getStringArray(R.array.versoes);
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>
+                (this, android.R.layout.simple_spinner_dropdown_item, versoes) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                // Get the Item from ListView
+                View view = super.getView(position, convertView, parent);
+                TextView tv = (TextView) view.findViewById(android.R.id.text1);
+                tv.setTextColor(Color.RED);
+                tv.setTextSize(18);
+                return view;
+            }
+        };
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT);
-
-        Spinner spinner = new Spinner(getApplicationContext());
-        String[] versoes = getResources().getStringArray(R.array.versoes);
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, versoes);
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(dataAdapter);
-
+        params.setMargins(20, 0, 20, 20);
+        spinner.setAdapter(arrayAdapter);
         Button buttonGo = new Button(getApplicationContext());
         buttonGo.setLayoutParams(params);
-        buttonGo.setText("Baixar");
+        buttonGo.setText("Confirmar");
+
+        buttonGo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                if (isDataBaseDownload(getApplicationContext(), String.valueOf(spinner.getSelectedItemId()))) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setTitle("ATENÇÂO");
+                    builder.setMessage("A versão escolhida já foi baixada. Se baixar novamente a mesma versão os dados" +
+                            " serão apagados. Você perderá seus textos favoritos e textos lidos.");
+                    builder.setPositiveButton("Baixar novamente", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            editor = sharedPrefDataBasePatch.edit();
+                            editor.putString("version", String.valueOf(spinner.getSelectedItemId())).commit();
+                            editor.putString("versionName", spinner.getSelectedItem().toString()).commit();
+                            if (frameLayout != null)
+                                if (linearLayout != null)
+                                    frameLayout.removeView(linearLayout);
+
+                            downloadDataBaseBible(String.valueOf(spinner.getSelectedItemId()));
+
+
+                        }
+                    });
+                    builder.setNegativeButton("Usar versão baixada", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            sharedPrefDataBasePatch.edit().putString("version", String.valueOf(spinner.getSelectedItemId())).commit();
+                            String[] versions = getResources().getStringArray(R.array.versoes);
+                            int i = (int) spinner.getSelectedItemId();
+                            sharedPrefDataBasePatch.edit().putString("versionName", versions[i]).commit();
+                            textViewTextBibleVersion.setText(versions[i]);
+                            if (frameLayout != null)
+                                if (linearLayout != null)
+                                    frameLayout.removeView(linearLayout);
+                        }
+                    });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                } else {
+                    if (frameLayout != null)
+                        if (linearLayout != null)
+                            frameLayout.removeView(linearLayout);
+                    downloadDataBaseBible(String.valueOf(spinner.getSelectedItemId()));
+
+                }
+
+
+            }
+
+
+        });
+
 
         TextView textView = new TextView(getApplicationContext());
         textView.setTextColor(Color.WHITE);
-        textView.setTextSize(16);
+        textView.setTextSize(18);
+        textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         params.setMargins(20, 0, 20, 20);
         textView.setLayoutParams(params);
         textView.setText(R.string.finished_install);
 
-        LinearLayout linearLayout = new LinearLayout(getApplicationContext());
+
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         linearLayout.setGravity(Gravity.CENTER);
-        linearLayout.setBackgroundColor(Color.BLACK);
+        linearLayout.setBackgroundColor(getResources().getColor(R.color.blue));
         params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         linearLayout.setLayoutParams(params);
         linearLayout.addView(textView);
         linearLayout.addView(spinner);
         linearLayout.addView(buttonGo);
-        FrameLayout frameLayout = findViewById(R.id.frame_layout_man);
+
         frameLayout.addView(linearLayout);
 
     }
 
-    private void runDownloadFromDownloadTask() {
+    private void runDownloadFromDownloadTask(String version) {
 
         if (isNetworkAvailable(this)) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -440,7 +470,7 @@ public class MainActivity extends AppCompatActivity {
                 FrameLayout frameLayout = findViewById(R.id.frame_layout_man);
                 frameLayout.addView(linearLayout);
 
-                new DownloadTask(getApplicationContext(), progressBar, frameLayout, linearLayout, sharedPrefDataBasePatch);
+                new DownloadTask(textViewTextBibleVersion,version, getApplicationContext(), progressBar, frameLayout, linearLayout, sharedPrefDataBasePatch);
 
             } else {
                 progressDialog = new ProgressDialog(MainActivity.this, R.style.ProgressBarStyle);
@@ -452,14 +482,14 @@ public class MainActivity extends AppCompatActivity {
                 progressDialog.setMax(100);
                 progressDialog.show();
 
-                new DownloadTask(getApplicationContext(), progressDialog, sharedPrefDataBasePatch);
-          }
-        }else{
+                new DownloadTask(textViewTextBibleVersion,version, getApplicationContext(), progressDialog, sharedPrefDataBasePatch);
+            }
+        } else {
             Toast.makeText(getApplicationContext(), R.string.sem_conexao, Toast.LENGTH_LONG).show();
         }
     }
 
-    private void downloadDataBaseBible(){
+    private void downloadDataBaseBible(String version) {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
@@ -494,23 +524,23 @@ public class MainActivity extends AppCompatActivity {
                 builder.show();
 
             } else {
-                runDownloadFromDownloadTask();
+                runDownloadFromDownloadTask(version);
             }
         } else {
 
-            runDownloadFromDownloadTask();
+            runDownloadFromDownloadTask(version);
         }
 
 
     }
 
-    static public boolean isDataBaseDownload(Context context) {
+    static public boolean isDataBaseDownload(Context context, String version) {
 
         File folderStorage;
-        String folderDest = "Android/data/"+PACKAGENAME+"/databases/";
+        String folderDest = "Android/data/" + PACKAGENAME + "/databases/";
         editor = context.getSharedPreferences("DataBase", Context.MODE_PRIVATE).edit();
 
-        switch (context.getSharedPreferences("DataBase",MODE_PRIVATE).getString("version","0")){
+        switch (version) {
 
             case "0":
                 folderDest = folderDest + DownloadTask.Utils.NAME_ACF;
@@ -564,6 +594,10 @@ public class MainActivity extends AppCompatActivity {
                 folderDest = folderDest + DownloadTask.Utils.NAME_TB;
                 DATABASENAME = DownloadTask.Utils.NAME_TB;
                 break;
+            default:
+                folderDest = folderDest + " ";
+                DATABASENAME = " ";
+                break;
 
 
         }
@@ -577,11 +611,12 @@ public class MainActivity extends AppCompatActivity {
 
             //If File is not present create directory
             if (folderStorage.exists()) {
-                 editor.putString("dataBasePatch",folderStorage.getAbsolutePath());
-                 editor.commit();
-                 return true;
-            }else{
-                return false;}
+                editor.putString("dataBasePatch", folderStorage.getAbsolutePath());
+                editor.commit();
+                return true;
+            } else {
+                return false;
+            }
 
         } else {
 
@@ -590,10 +625,10 @@ public class MainActivity extends AppCompatActivity {
                             + folderDest);
 
             if (folderStorage.exists()) {
-                editor.putString("dataBasePatch",folderStorage.getAbsolutePath());
+                editor.putString("dataBasePatch", folderStorage.getAbsolutePath());
                 editor.commit();
                 return true;
-            }else{
+            } else {
                 return false;
             }
         }
@@ -604,11 +639,10 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == REQUEST_STORAGE) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                if (!isDataBaseDownload(getApplicationContext())) {
+                if (!isDataBaseDownload(getApplicationContext(), getSharedPreferences("DataBase", MODE_PRIVATE).getString("version", " "))) {
                     if (isNetworkAvailable(this)) {
-                        runDownloadFromDownloadTask();
-                    }
-                    else{
+                        selectBibleVersion();
+                    } else {
                         Toast.makeText(getApplicationContext(), R.string.not_internet_avaliable, Toast.LENGTH_LONG).show();
                     }
                 }
@@ -617,7 +651,7 @@ public class MainActivity extends AppCompatActivity {
                         || ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         || ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.ACCESS_NOTIFICATION_POLICY)
                 ) {
-                    downloadDataBaseBible();
+                    selectBibleVersion();
                 }
             }
         }
@@ -654,10 +688,10 @@ public class MainActivity extends AppCompatActivity {
         boolean alarmUp = (PendingIntent.getBroadcast(MainActivity.this, 121312131, tempIntent, PendingIntent.FLAG_NO_CREATE) != null);
 
 
-        if(alarmUp)
-            Log.e("alarme ","ativado");
-       else{
-            Log.e("alarme ","desativado");
+        if (alarmUp)
+            Log.e("alarme ", "ativado");
+        else {
+            Log.e("alarme ", "desativado");
         }
         return alarmUp;
 
@@ -696,8 +730,8 @@ public class MainActivity extends AppCompatActivity {
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
         int h = Integer.parseInt(settings.getString("hora", "10"));
-        int m = Integer.parseInt(settings.getString("minuto", "30"));	
-		
+        int m = Integer.parseInt(settings.getString("minuto", "30"));
+
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(System.currentTimeMillis());
         c.set(Calendar.HOUR_OF_DAY, h);
@@ -877,10 +911,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void versiculoDoDia() throws ParseException {
 
-                SharedPreferences settings;
-                settings = getSharedPreferences("versDiaPreference", Activity.MODE_PRIVATE);
+        SharedPreferences settings;
+        settings = getSharedPreferences("versDiaPreference", Activity.MODE_PRIVATE);
         textViewAssuntoVers.setText(settings.getString("assunto", getString(R.string.peace)));
-                textViewAssuntoVers.setMinLines(2);
+        textViewAssuntoVers.setMinLines(2);
         textViewAssuntoVers.setTextColor(Color.BLACK);
         textViewVersDia.setText(Html.fromHtml(settings.getString("versDia", getString(R.string.versiculo_text))
                 + " \n(" + settings.getString("livroNome", getString(R.string.book_name)) + " " +
@@ -930,7 +964,6 @@ public class MainActivity extends AppCompatActivity {
                 });
 
 
-
     }
 
     protected void onPostResume() {
@@ -941,25 +974,23 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        editor = sharedPrefDataBasePatch.edit();
-        editor.putString("version","0");
-        editor.commit();
+        textViewTextBibleVersion.setText(sharedPrefDataBasePatch.getString("versionName", "Escolha uma versão bíblica"));
 
         SharedPreferences settings = getSharedPreferences("seekbar", Activity.MODE_PRIVATE);
         editor = settings.edit();
         editor.putInt("brilhoAtual", Lista_Biblia.getScreenBrightness(getApplicationContext()));
         editor.commit();
 
-
+        String version = getSharedPreferences("DataBase", MODE_PRIVATE).getString("version", "0");
         if (!checarAlarmeExiste())
-            if (isDataBaseDownload(getApplicationContext()))
+            if (isDataBaseDownload(getApplicationContext(), version))
                 agendarAlarmeVersiculo();
 
         try {
-            if (isDataBaseDownload(getApplicationContext())) {
+            if (isDataBaseDownload(getApplicationContext(), version)) {
                 versiculoDoDia();
-            }else{
-                downloadDataBaseBible();
+            } else {
+                selectBibleVersion();
             }
         } catch (ParseException e) {
             e.printStackTrace();
@@ -985,11 +1016,8 @@ public class MainActivity extends AppCompatActivity {
         super.onBackPressed();
         return;
     }
-    protected void onPause() {
 
-        if (mAdView != null) {
-            mAdView.pause();
-        }
+    protected void onPause() {
         super.onPause();
     }
 
@@ -1059,17 +1087,19 @@ public class MainActivity extends AppCompatActivity {
 
         // update selected item and title, then close the drawer
         mDrawerList.setItemChecked(position, true);
-        // setTitle(menuTitulos[position]);
+        String version = getSharedPreferences("DataBase", MODE_PRIVATE).getString("version", "0");
         switch (position) {
             case 0:
-                if (isDataBaseDownload(getApplicationContext())) {
-                intent = new Intent(MainActivity.this, Activity_favorito.class);
-                startActivity(intent);}
+                if (isDataBaseDownload(getApplicationContext(), version)) {
+                    intent = new Intent(MainActivity.this, Activity_favorito.class);
+                    startActivity(intent);
+                }
                 break;
             case 1:
-                if (isDataBaseDownload(getApplicationContext())) {
-                intent = new Intent(MainActivity.this, ActivityAnotacao.class);
-                startActivity(intent);}
+                if (isDataBaseDownload(getApplicationContext(), version)) {
+                    intent = new Intent(MainActivity.this, ActivityAnotacao.class);
+                    startActivity(intent);
+                }
                 break;
             case 2:
                 opcaoDicionario(getApplicationContext());
@@ -1083,9 +1113,10 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
             case 4:
-                if (isDataBaseDownload(getApplicationContext())) {
-                intent = new Intent(MainActivity.this, GraficoGeral.class);
-                startActivity(intent);}
+                if (isDataBaseDownload(getApplicationContext(), version)) {
+                    intent = new Intent(MainActivity.this, GraficoGeral.class);
+                    startActivity(intent);
+                }
                 break;
             case 5:
                 intent = new Intent(MainActivity.this, SettingsActivity.class);
@@ -1111,7 +1142,7 @@ public class MainActivity extends AppCompatActivity {
         switch (Locale.getDefault().getLanguage()) {
 
             case "pt":
-                if (isDataBaseDownload(context)) {
+                if (isDataBaseDownload(context, context.getSharedPreferences("DataBase", MODE_PRIVATE).getString("version", " "))) {
                     context.startActivity(new Intent(context, DicionarioActivity.class)
                             .setFlags(FLAG_ACTIVITY_NEW_TASK));
                 }
@@ -1178,7 +1209,7 @@ public class MainActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
-   private class AlterarAlarm implements View.OnClickListener {
+    private class AlterarAlarm implements View.OnClickListener {
 
         TextView textViewhora, textViewMin;
         int hora, min;
@@ -1293,9 +1324,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onDestroy() {
-        if (mAdView != null) {
-            mAdView.destroy();
-        }
         super.onDestroy();
     }
 

@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -36,29 +37,37 @@ public class DownloadTask {
     private ProgressDialog progressDialog;
     private FrameLayout frameLayout;
     private LinearLayout linearLayout;
+    private String versionName;
+    private TextView textViewTextBibleVersion;
 
-    public DownloadTask(Context context, ProgressDialog progressDialog, SharedPreferences sharedPref) {
+    public DownloadTask(TextView textViewTextBibleVersion,String version, Context context, ProgressDialog progressDialog, SharedPreferences sharedPref) {
         packageName = context.getPackageName();
         this.sharedPref = sharedPref;
         this.progressDialog = progressDialog;
-        runTask(sharedPref.getString("version", "en"));
+        String[] versionsBible = context.getResources().getStringArray(R.array.versoes);
+        versionName = versionsBible[Integer.valueOf(version)];
+        this.textViewTextBibleVersion = textViewTextBibleVersion;
+        runTask(version);
     }
 
 
-    public DownloadTask(Context context, ProgressBar progressBar,
+    public DownloadTask(TextView textViewTextBibleVersion,String version,Context context, ProgressBar progressBar,
                         FrameLayout frameLayout, LinearLayout linearLayout, SharedPreferences sharedPref) {
         packageName = context.getPackageName();
         this.sharedPref = sharedPref;
         this.progressBar = progressBar;
         this.frameLayout = frameLayout;
         this.linearLayout = linearLayout;
-        runTask(sharedPref.getString("version", "0"));
+        String[] versionsBible = context.getResources().getStringArray(R.array.versoes);
+        versionName = versionsBible[Integer.valueOf(version)];
+        this.textViewTextBibleVersion = textViewTextBibleVersion;
+        runTask(version);
 
     }
 
-    private void runTask(String language) {
+    private void runTask(String version) {
 
-        switch (language) {
+        switch (version) {
             case "0":
                 downloadUrl = downloadUrl.replace("XXX", Utils.ACF_ZIP);
                 downloadFileName = Utils.ACF_ZIP;
@@ -118,9 +127,9 @@ public class DownloadTask {
         Log.e(TAG, downloadUrl);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            new DownloadingTask(progressBar, sharedPref).execute(packageName);
+            new DownloadingTask(version,progressBar, sharedPref).execute(packageName);
         } else {
-            new DownloadingTask(progressDialog, sharedPref).execute(packageName);
+            new DownloadingTask(version,progressDialog, sharedPref).execute(packageName);
         }
 
 
@@ -134,17 +143,20 @@ public class DownloadTask {
         ProgressDialog progressDialog;
         ProgressBar progressBar;
         SharedPreferences sharedPref;
+        String version;
 
-        public DownloadingTask(ProgressBar progressBar, SharedPreferences sharedPref) {
+        public DownloadingTask(String version,ProgressBar progressBar, SharedPreferences sharedPref) {
             this.sharedPref = sharedPref;
             this.progressBar = progressBar;
+            this.version = version;
 
         }
 
-        public DownloadingTask(ProgressDialog progressDialog ,SharedPreferences sharedPref){
+        public DownloadingTask(String version,ProgressDialog progressDialog ,SharedPreferences sharedPref){
 
             this.sharedPref = sharedPref;
             this.progressDialog = progressDialog;
+            this.version = version;
         }
 
         @Override
@@ -159,6 +171,10 @@ public class DownloadTask {
                 if (outputFile != null) {
                     Log.e(TAG, "Download Completed and Unzip");
                     Log.e(TAG,"sharedPrefPatch: " + sharedPref.getString("dataBasePatch","invalid"));
+                    sharedPref.edit().putString("version",version).commit();
+                    sharedPref.edit().putString("versionName",versionName).commit();
+                    textViewTextBibleVersion.setText(versionName);
+
                 } else {
                     //If download failed change button text
                     new Handler().postDelayed(new Runnable() {

@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 
@@ -73,10 +74,16 @@ public class ListaAdaptador extends BaseAdapter {
     public View getView(final int position, View convertView, ViewGroup parent) {
 
 
+
+
         if(convertView == null) {
             convertView = mInflater.inflate(R.layout.activity_biblia_aberta, null);
             itemSuporteBiblia = new ItemSuporteBiblia(convertView);
             convertView.setTag(itemSuporteBiblia);
+
+
+
+
 
         }else{
 
@@ -101,11 +108,12 @@ public class ListaAdaptador extends BaseAdapter {
 
         //Habilita o botão de abrir livro quando for pesquisa
         if(pesquiar){
-
+            FrameLayout frameLayoutBibliaAberta;
+            frameLayoutBibliaAberta = convertView.findViewById(R.id.frameLayoutBibliaAberta);
             itemSuporteBiblia.buttonAbrirLivro.setVisibility(View.VISIBLE);
             itemSuporteBiblia.buttonAbrirLivro.setEnabled(true);
             itemSuporteBiblia.textoAberto.setText(Html.fromHtml(biblia.toPesquisarString()));
-
+            frameLayoutBibliaAberta.setPadding(0,0,0,1);
             itemSuporteBiblia.buttonAbrirLivro.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
