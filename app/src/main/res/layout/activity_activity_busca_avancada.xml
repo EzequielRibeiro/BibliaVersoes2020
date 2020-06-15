@@ -5,169 +5,177 @@
     android:id="@+id/framelayoutBuscar"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_gravity="center"
     android:orientation="vertical"
     tools:context=".Activity_busca_avancada">
 
 
-    <LinearLayout
-        android:id="@+id/linearLayoutBusca"
+    <ProgressBar
+        android:id="@+id/progressBarBusca"
+        style="@android:style/Widget.Material.ProgressBar.Large"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center" />
+
+    <ScrollView
+        android:id="@+id/scrollViewBusca"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:layout_gravity="center">
 
-        <TextView
-            android:id="@+id/textView3"
+        <LinearLayout
+            android:id="@+id/linearLayoutBusca"
             android:layout_width="match_parent"
-            android:layout_height="70dp"
-            android:layout_centerHorizontal="false"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginEnd="5dp"
-            android:layout_marginBottom="5dp"
-            android:background="@drawable/borda_layout"
+            android:layout_height="wrap_content"
             android:gravity="center"
-            android:paddingLeft="5dp"
-            android:paddingTop="5dp"
-            android:paddingRight="5dp"
-            android:paddingBottom="5dp"
-            android:singleLine="true"
-            android:text="@string/busca_avancada_title"
-            android:textAlignment="center"
-            android:textColor="#000000"
-            android:textSize="18sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <RadioGroup
-                android:id="@+id/radioGroup"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:gravity="left"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toTopOf="@+id/textViewPesquisarSomente"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <RadioButton
-                    android:id="@+id/radio_velho"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:onClick="onRadioButtonClicked"
-                    android:text="@string/velho_testamento"
-                    android:textColor="#040404"
-                    android:textSize="18sp" />
-
-                <RadioButton
-                    android:id="@+id/radio_novo"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:onClick="onRadioButtonClicked"
-                    android:text="@string/novo_testamento"
-                    android:textColor="#040404"
-                    android:textSize="18sp" />
-
-                <RadioButton
-                    android:id="@+id/radio_Biblia"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:onClick="onRadioButtonClicked"
-                    android:text="@string/toda_b_blia"
-                    android:textColor="#040404"
-                    android:textSize="18sp" />
-            </RadioGroup>
+            android:orientation="vertical">
 
             <TextView
-                android:id="@+id/textView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:text="@string/pesquisar_por"
-                android:textColor="@color/dark"
-                android:textSize="18sp"
-                app:layout_constraintBottom_toTopOf="@+id/editTextAvanc"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <TextView
-                android:id="@+id/textViewDeveloperBusca"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="00000"
-                android:textColor="#c33f3e41"
-                android:textSize="14sp"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <Button
-                android:id="@+id/buttonPesquisaAvanc"
-                android:layout_width="200dp"
-                android:layout_height="50dp"
-                android:layout_marginBottom="10dp"
-                android:background="@drawable/buttonshape"
-                android:focusable="auto"
-                android:focusableInTouchMode="false"
-                android:text="@string/pesquisar"
-                android:textColor="@color/white"
-                app:layout_constraintBottom_toTopOf="@+id/textViewDeveloperBusca"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <EditText
-                android:id="@+id/editTextAvanc"
+                android:id="@+id/textView3"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
+                android:layout_height="70dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
                 android:layout_marginBottom="10dp"
                 android:background="@drawable/borda_layout"
-                android:imeOptions="actionDone|actionGo|actionSearch|actionNext|actionSend"
-                android:inputType="text"
+                android:gravity="center"
                 android:paddingLeft="5dp"
-                android:selectAllOnFocus="false"
+                android:paddingTop="5dp"
+                android:paddingRight="5dp"
+                android:paddingBottom="5dp"
                 android:singleLine="true"
+                android:text="@string/busca_avancada_title"
+                android:textAlignment="center"
                 android:textColor="#000000"
                 android:textSize="18sp"
-                app:layout_constraintBottom_toTopOf="@+id/buttonPesquisaAvanc"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <TextView
-                android:id="@+id/textViewPesquisarSomente"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="left"
-                android:text="@string/pesquisar_somente_em"
-                android:textColor="#000000"
-                android:textSize="18sp"
-                app:layout_constraintBottom_toTopOf="@+id/spinnerBuscaAvanc"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
+                app:layout_constraintTop_toTopOf="parent" />
 
-            <Spinner
-                android:id="@+id/spinnerBuscaAvanc"
-                style="@android:style/Widget.DeviceDefault.Light.Spinner"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-                android:layout_marginBottom="16dp"
-                android:gravity="left"
-                app:layout_constraintBottom_toTopOf="@+id/textView"
-                app:layout_constraintStart_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textViewPesquisarSomente" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </LinearLayout>
+                <RadioGroup
+                    android:id="@+id/radioGroup"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:gravity="left"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toTopOf="@+id/textViewPesquisarSomente"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <RadioButton
+                        android:id="@+id/radio_velho"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:onClick="onRadioButtonClicked"
+                        android:text="@string/velho_testamento"
+                        android:textColor="#040404"
+                        android:textSize="18sp" />
+
+                    <RadioButton
+                        android:id="@+id/radio_novo"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:onClick="onRadioButtonClicked"
+                        android:text="@string/novo_testamento"
+                        android:textColor="#040404"
+                        android:textSize="18sp" />
+
+                    <RadioButton
+                        android:id="@+id/radio_Biblia"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:onClick="onRadioButtonClicked"
+                        android:text="@string/toda_b_blia"
+                        android:textColor="#040404"
+                        android:textSize="18sp" />
+                </RadioGroup>
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/pesquisar_por"
+                    android:textColor="@color/dark"
+                    android:textSize="18sp"
+                    app:layout_constraintBottom_toTopOf="@+id/editTextAvanc"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/spinnerBuscaAvanc" />
+
+                <Button
+                    android:id="@+id/buttonPesquisaAvanc"
+                    android:layout_width="200dp"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/buttonshape"
+                    android:focusable="auto"
+                    android:focusableInTouchMode="false"
+                    android:text="@string/pesquisar"
+                    android:textColor="@color/white"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/editTextAvanc" />
+
+                <EditText
+                    android:id="@+id/editTextAvanc"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/borda_layout"
+                    android:imeOptions="actionDone|actionGo|actionSearch|actionNext|actionSend"
+                    android:importantForAutofill="no"
+                    android:inputType="text"
+                    android:paddingStart="5dp"
+                    android:selectAllOnFocus="false"
+                    android:singleLine="true"
+                    android:textColor="#000000"
+                    android:textSize="18sp"
+                    app:layout_constraintBottom_toTopOf="@+id/buttonPesquisaAvanc"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+                <TextView
+                    android:id="@+id/textViewPesquisarSomente"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/pesquisar_somente_em"
+                    android:textColor="#000000"
+                    android:textSize="18sp"
+                    app:layout_constraintBottom_toTopOf="@+id/spinnerBuscaAvanc"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
+
+                <Spinner
+                    android:id="@+id/spinnerBuscaAvanc"
+                    style="@android:style/Widget.DeviceDefault.Light.Spinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:layout_marginStart="8dp"
+                    android:gravity="start"
+                    app:layout_constraintBottom_toTopOf="@+id/textView"
+                    app:layout_constraintStart_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/textViewPesquisarSomente" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+    </ScrollView>
 
 
 </FrameLayout>

@@ -127,6 +127,8 @@
     <string name="capitulo_number" translatable="false">16</string>
     <string name="versiculo_number" translatable="false">33</string>
     <string name="compartilharWhat">WhatsApp</string>
+    <string name="aviso_escolha_book" translatable="false">O aplicativo permite escolher entre 13 traduções da Bíblia.\nSerá preciso estar conectado com a internet para fazer o download da versão escolhida.
+    Após o download o aplicativo não mais necessita de conexão para ser utilizado.\nQualquer problema encontrado entre em contado com o desenvolvedor pelo e-mail indicado no MENU->SOBRE.\nObrigado.</string>
 
 
     <string-array name="menu_array">

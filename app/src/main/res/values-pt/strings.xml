@@ -129,8 +129,8 @@
     <string name="pesquisando">Pesquisando ...</string>
     <string name="aguarde_pesquisando">Aguarde um momento ...</string>
     <string name="pesquisa_cancelada">Pesquisa cancelada</string>
-    <string name="salvar_nos_favorito">Salvar como favorito</string>
-    <string name="salvar_para_compartilhar">Salvar para compartilhar</string>
+    <string name="salvar_nos_favorito">Favorito</string>
+    <string name="salvar_para_compartilhar">Compartilhar</string>
     <string name="versiculo_do_dia">\"Versículo do dia: \"</string>
     <string name="livro_evangelho_epistola">Livros - Evangelho - Epistolas</string>
     <string name="bibliaLivEp">Bíblia</string>

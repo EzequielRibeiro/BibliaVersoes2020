@@ -6,7 +6,7 @@ android {
         config {
             keyAlias 'key'
             keyPassword '123456'
-            storeFile file('D:\\Projeto-Android\\BibliaNvi\\key.jks')
+            storeFile file('D:\\Projeto-Android\\BibliaVersoes2020\\keybibliaversoes.jks')
             storePassword '123456'
         }
     }
@@ -16,8 +16,8 @@ android {
         applicationId 'com.projeto.biblianvi.BibliaVersoes'
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 13
-        versionName '1.13'
+        versionCode 5
+        versionName '1.0'
         signingConfig signingConfigs.config
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -45,6 +45,15 @@ android {
         multiDexEnabled true
     }
 
+}
+
+android {
+    lintOptions {
+        checkReleaseBuilds false
+        // Or, if you prefer, you can continue to check for errors in release builds,
+        // but continue the build even when errors are found:
+        abortOnError false
+    }
 }
 
 

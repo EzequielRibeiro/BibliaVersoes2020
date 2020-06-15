@@ -25,6 +25,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,9 +43,8 @@ public class Activity_busca_avancada extends Activity {
     private EditText editText;
     private Spinner spinnerLivros;
     private RadioButton radioNovo, radioVelho, radioBib;
-    private TextView textViewDeveloper;
-
-
+    private ProgressBar progressBarBusca;
+    private LinearLayout linearLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,9 +57,8 @@ public class Activity_busca_avancada extends Activity {
         radioVelho = findViewById(R.id.radio_velho);
         radioNovo = findViewById(R.id.radio_novo);
         radioBib = findViewById(R.id.radio_Biblia);
-        textViewDeveloper = findViewById(R.id.textViewDeveloperBusca);
-
-        textViewDeveloper.setText(BuildConfig.VERSION_NAME);
+        progressBarBusca  =  findViewById(R.id.progressBarBusca);
+        progressBarBusca.setVisibility(View.GONE);
 
         botaoPesquisar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -217,7 +216,18 @@ public class Activity_busca_avancada extends Activity {
 
 
     public void onBackPressed() {
-        super.onBackPressed();
+
+        if (linearLayout != null) {
+            ViewGroup parent = (ViewGroup) linearLayout.getParent();
+
+            if (parent != null) {
+                parent.removeView(linearLayout);
+                linearLayout = null;
+            }
+        }else{
+            super.onBackPressed();
+        }
+
         return;
     }
 
@@ -227,17 +237,20 @@ public class Activity_busca_avancada extends Activity {
         private BibliaBancoDadosHelper bibliaHelp;
         private ListaAdaptador listaAdaptador;
         private ListView listView;
-        private ProgressBar progressBarSearch;
         private FrameLayout frameLayout;
         private List<Biblia> lista;
-        private LinearLayout linearLayout,linearLayoutBusca;
+        private LinearLayout linearLayoutBusca;
+
+
 
         public PesquisarBanco(Context context) {
 
-            bibliaHelp = new BibliaBancoDadosHelper(context);
-            listView = new ListView(context);
+            bibliaHelp   = new BibliaBancoDadosHelper(context);
+            listView     = new ListView(context);
             linearLayout = new LinearLayout(context);
             linearLayout.setOrientation(LinearLayout.VERTICAL);
+            linearLayoutBusca =  findViewById(R.id.linearLayoutBusca);
+            frameLayout       =  findViewById(R.id.framelayoutBuscar);
 
         }
 
@@ -271,15 +284,50 @@ public class Activity_busca_avancada extends Activity {
                 listaAdaptador = new ListaAdaptador(Activity_busca_avancada.this, lista, true);
 
                 listView.setAdapter(listaAdaptador);
-                listaAdaptador.notifyDataSetChanged();
 
+                FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) frameLayout.getLayoutParams();
+                params.height = LinearLayout.LayoutParams.MATCH_PARENT;
+                params.width  = LinearLayout.LayoutParams.MATCH_PARENT;
+
+                linearLayout.setLayoutParams(params);
+                listView.setLayoutParams(params);
+
+                Button button = new Button(getApplicationContext());
+                button.setText("Fazer nova pesquisa");
+                button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        if(frameLayout != null && linearLayout != null)
+                            frameLayout.removeView(linearLayout);
+                    }
+                });
+
+                linearLayout.addView(button);
+                linearLayout.addView(listView);
+                frameLayout.addView(linearLayout);
                 Toast.makeText(getBaseContext(), i + getString(R.string.foram_encontrados), Toast.LENGTH_LONG).show();
 
             } else {
 
                 Toast.makeText(getBaseContext(), R.string.nada_encontrado, Toast.LENGTH_LONG).show();
-                finish();
+
             }
+
+
+
+            progressBarBusca.setVisibility(View.GONE);
+            linearLayoutBusca.setVisibility(View.VISIBLE);
+
+
+        }
+
+        @Override
+        protected void onPreExecute() {
+
+            linearLayoutBusca.setVisibility(View.INVISIBLE);
+            progressBarBusca.setVisibility(View.VISIBLE);
+
 
             Boolean modoNoturno =  PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("noturnoPref", true);
 
@@ -289,54 +337,7 @@ public class Activity_busca_avancada extends Activity {
                 linearLayout.setBackgroundColor(getResources().getColor(R.color.white));
             }
 
-            FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) frameLayout.getLayoutParams();
-            params.height = LinearLayout.LayoutParams.MATCH_PARENT;
-            params.width  = LinearLayout.LayoutParams.MATCH_PARENT;
 
-            linearLayout.setLayoutParams(params);
-            listView.setLayoutParams(params);
-
-
-            params.height = LinearLayout.LayoutParams.WRAP_CONTENT;
-            params.width  = LinearLayout.LayoutParams.MATCH_PARENT;
-            Button button = new Button(getApplicationContext());
-            button.setText("Fazer nova pesquisa");
-            button.setLayoutParams(params);
-            button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    if(frameLayout != null && linearLayout != null)
-                          frameLayout.removeView(linearLayout);
-                }
-            });
-
-            linearLayout.addView(button);
-            linearLayout.addView(listView);
-
-            frameLayout.addView(linearLayout);
-            progressBarSearch.setVisibility(View.GONE);
-            linearLayoutBusca.setVisibility(View.VISIBLE);
-
-
-        }
-
-        @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-        @Override
-        protected void onPreExecute() {
-
-            linearLayoutBusca = findViewById(R.id.linearLayoutBusca);
-            linearLayoutBusca.setVisibility(View.INVISIBLE);
-            frameLayout = findViewById(R.id.framelayoutBuscar);
-            FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) frameLayout.getLayoutParams();
-            params.height = LinearLayout.LayoutParams.WRAP_CONTENT;
-            params.width  = LinearLayout.LayoutParams.WRAP_CONTENT;
-            params.gravity = Gravity.CENTER;
-            progressBarSearch = new ProgressBar(Activity_busca_avancada.this, null, android.R.attr.progressBarStyleLarge);
-            progressBarSearch.setIndeterminate(true);
-            progressBarSearch.setLayoutParams(params);
-            progressBarSearch.setVisibility(View.VISIBLE);
-            frameLayout.addView(progressBarSearch);
         }
 
         protected void onProgressUpdate(Integer... values) {

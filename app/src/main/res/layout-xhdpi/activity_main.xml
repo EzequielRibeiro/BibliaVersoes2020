@@ -256,7 +256,7 @@
                         android:layout_weight="1"
                         android:text="Almeida Corrigida e Fiel ACF 1994"
                         android:textColor="@color/green"
-                        android:textSize="18sp" />
+                        android:textSize="14sp" />
 
                     <Button
                         android:id="@+id/buttonChoiceBibleVersion"

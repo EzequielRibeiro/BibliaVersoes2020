@@ -158,9 +158,9 @@ public class BibliaBancoDadosHelper extends SQLiteOpenHelper {
                 "verses.testament and books.id = verses.book and books.name like '" + book + "%';";
        */
 
-        String query = "select book.id,testament.name,book.name,verse.chapter,verse.verse,verse.text,verse.lido,verse.rowid, stories.title " +
-                "from testament,verse,book left join stories ON stories.book + 1 = book.id and stories.chapter = verse.chapter and " +
-                "stories.verse = verse.verse where book.id = verse.book_id and book.name like '" + book + "';";
+        String query = "select book.id,testament.name,book.name,verse.chapter,verse.verse,verse.text,verse.lido,verse.rowid, stories.title,metadata.value " +
+                "from testament,verse,book,metadata left join stories ON stories.book + 1 = book.id and stories.chapter = verse.chapter and " +
+                "stories.verse = verse.verse where book.id = verse.book_id and metadata.[key] like 'name' and book.name like '" + book + "';";
 
         openDataBase();
 
@@ -181,6 +181,7 @@ public class BibliaBancoDadosHelper extends SQLiteOpenHelper {
                 biblia.setLido(cursor.getInt(6));
                 biblia.setIdVerse(cursor.getString(7));
                 biblia.setTitleCapitulo(cursor.getString(8));
+                biblia.setBookVersion(cursor.getString(9));
                 if (cursor.getString(8) != null)
                     Log.e("title", cursor.getString(8));
 
@@ -353,7 +354,7 @@ public class BibliaBancoDadosHelper extends SQLiteOpenHelper {
 
     public void setVersCompartilhar(Biblia bi){
 
-        String versiculo = bi.getVersesText() + " (" + bi.getBooksName() + " " + bi.getChapter() + ":" + bi.getVersesNum() + ") ";
+        String versiculo = bi.getText() + " (" + bi.getBooksName() + " " + bi.getChapter() + ":" + bi.getVersesNum() + ") ";
         String query = "insert into compartilhar (msg) values ('"+versiculo+"')";
         SQLiteDatabase db = SQLiteDatabase.openDatabase(DB_PATH, null, SQLiteDatabase.OPEN_READWRITE | SQLiteDatabase.NO_LOCALIZED_COLLATORS);
 
@@ -515,7 +516,6 @@ public class BibliaBancoDadosHelper extends SQLiteOpenHelper {
 
         cursor = myDataBase.rawQuery(query, null);
 
-        // 3. go over each row, build book and add it to list
         Biblia biblia;
 
         if(cursor!=null && cursor.getCount()>0)
@@ -668,7 +668,7 @@ public class BibliaBancoDadosHelper extends SQLiteOpenHelper {
             SharedPreferences settings = myContext.getSharedPreferences("versDiaPreference", Activity.MODE_PRIVATE);
             SharedPreferences.Editor editor = settings.edit();
             editor.putString("assunto", v.getAssunto());
-            editor.putString("versDia", v.getVersesText());
+            editor.putString("versDia", v.getText());
             editor.putString("livroNome",v.getBooksName());
             editor.putString("capVersDia", v.getChapter());
             editor.putString("verVersDia",v.getVersesNum());
@@ -687,7 +687,7 @@ public class BibliaBancoDadosHelper extends SQLiteOpenHelper {
 
         String query = "select book.[name],verse.[chapter],verse.[verse],verse.[text],selecionados.[assunto]" +
                 " from verse,book,selecionados where [verse].[book_id] = book.[id]" +
-                " and [selecionados].[livro] = book.[id]" +
+                " and [selecionados].[livro] + 1 = book.[id]" +
                 " and [selecionados].[cap] = verse.[chapter]" +
                 " and [selecionados].[vers] = verse.[verse]" +
                 " and [selecionados].[id] ="+id;
@@ -735,181 +735,6 @@ public class BibliaBancoDadosHelper extends SQLiteOpenHelper {
         return i;
     }
 
-    public void deleteNota(String id){
-
-        String query = "delete from nota where nota.id ="+ id;
-
-        openDataBase();
-
-        myDataBase.execSQL(query);
-
-        close();
-
-    }
-
-    public void salvarNota(String titulo,String texto,String data){
-
-        String query = "insert into nota (id,titulo,texto,data_) values (null,'"+titulo+"','"+texto+"','"+data+"')";
-        SQLiteDatabase db = SQLiteDatabase.openDatabase(DB_PATH, null, SQLiteDatabase.OPEN_READWRITE | SQLiteDatabase.NO_LOCALIZED_COLLATORS);
-        try {
-            db.beginTransaction();
-            db.execSQL(query);
-            db.setTransactionSuccessful();
-
-        } catch (Exception e) {
-            throw  new Error("Insert nota");
-        } finally {
-            db.endTransaction();
-            db.close();
-        }
-    }
-
-    public ArrayList<Anotacao> getNota() {
-
-        ArrayList<Anotacao> notas = new ArrayList<Anotacao>();
-
-
-        String query = "SELECT nota.[id],nota.[titulo],nota.[texto]," +
-                "nota.[data_] FROM nota";
-
-        openDataBase();
-            cursor = myDataBase.rawQuery(query, null);
-            Anotacao anotacao;
-            if (cursor.moveToFirst()) {
-                do {
-                    anotacao = new Anotacao();
-                    anotacao.setId(cursor.getInt(0));
-                    anotacao.setTitulo(cursor.getString(1));
-                    anotacao.setTexto(cursor.getString(2));
-                    anotacao.setData(cursor.getString(3));
-                    notas.add(anotacao);
-                } while (cursor.moveToNext());
-            }
-        close();
-        return notas;
-    }
-
-    public void deleteFavorito(String id){
-
-        String query = "delete from favorito where idVerso = "+id;
-        SQLiteDatabase db = SQLiteDatabase.openDatabase(DB_PATH, null, SQLiteDatabase.OPEN_READWRITE | SQLiteDatabase.NO_LOCALIZED_COLLATORS);
-
-        try {
-            db.beginTransaction();
-            db.execSQL(query);
-            db.setTransactionSuccessful();
-        } catch (Exception e) {
-            throw  new Error("Delete compartilhar");
-        } finally {
-            db.endTransaction();
-            db.close();
-        }
-    }
-
-    public void setFavorito(String i){
-
-
-        String q = "insert into favorito (idVerso) values ('"+i+"')";
-        String k = "select count(*) from favorito where idVerso ="+i;
-        openDataBase();
-        cursor = myDataBase.rawQuery(k,null);
-        int c = 0;
-
-        if(cursor.moveToFirst())
-           c = cursor.getInt(0);
-
-        close();
-       if(c == 0) {
-
-           SQLiteDatabase db = SQLiteDatabase.openDatabase(DB_PATH, null, SQLiteDatabase.OPEN_READWRITE | SQLiteDatabase.NO_LOCALIZED_COLLATORS);
-           try {
-               db.beginTransaction();
-               db.execSQL(q);
-               db.setTransactionSuccessful();
-           } catch (Exception e) {
-               throw new Error("Insert favorito ID");
-           } finally {
-               db.endTransaction();
-               db.close();
-           }
-       }
-    }
-
-    public List<Biblia> getFavorito() {
-
-        List<Biblia> books = new LinkedList<Biblia>();
-
-        String query = "select favorito.idVerso,book.name,verse.chapter,verse.verse,verse.text " +
-                "from verse,book,favorito where book.id = verse.book_id " +
-                "and [favorito].[idVerso] = verse.[rowid]";
-
-        openDataBase();
-
-        cursor = myDataBase.rawQuery(query, null);
-
-        Biblia biblia;
-
-        if(cursor!=null && cursor.getCount()>0)
-            if (cursor.moveToFirst()) {
-                do {
-
-                        biblia = new Biblia();
-                        biblia.setIdVerse(cursor.getString(0));
-                        biblia.setBooksName(cursor.getString(1));
-                    biblia.setChapter(cursor.getString(2));
-                        biblia.setVerseNum(cursor.getString(3));
-                        biblia.setText(cursor.getString(4));
-
-                    books.add(biblia);
-
-                } while (cursor.moveToNext());
-            }
-
-        close();
-
-        return books;
-    }
-
-    // tabelaName = favorito;
-    //campos = "(id integer primary key,idVerso TINYINT(3) not null)";
-
-    public void criarTabela(String tabelaName,String campos){
-
-        String b = "CREATE TABLE IF NOT EXISTS "+tabelaName+campos;
-
-        openDataBase();
-
-        if(myDataBase.isOpen()) {
-            myDataBase.execSQL(b);
-            close();
-        }
-
-    }
-
-    public int tabelaExiste(String tableName){
-
-
-        String b = "SELECT count(*) FROM sqlite_master WHERE type='table' AND name='"+tableName+"'";
-
-         openDataBase();
-
-          if(myDataBase.isOpen()) {
-
-            cursor = myDataBase.rawQuery(b, null);
-
-            cursor.moveToFirst();
-
-            int i = cursor.getInt(0);
-
-            close();
-
-            return  i;
-
-        }
-
-        return  0;
-
-    }
 
 
     public class Dicionario {
@@ -969,7 +794,7 @@ public class BibliaBancoDadosHelper extends SQLiteOpenHelper {
 
         @Override
         public String toString() {
-            return getVersesText() + " (" + getBooksName() + " " + getChapter() + ":" + getVersesNum() + ")";
+            return getText() + " (" + getBooksName() + " " + getChapter() + ":" + getVersesNum() + ")";
         }
     }
 

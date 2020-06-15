@@ -99,6 +99,8 @@ public class MainActivity extends AppCompatActivity {
     static private SharedPreferences.Editor editor;
     static public String DATABASENAME;
     private FirebaseRemoteConfig mFirebaseRemoteConfig;
+    private FrameLayout frameLayout;
+    private LinearLayout linearLayout;
 
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -167,6 +169,7 @@ public class MainActivity extends AppCompatActivity {
         text_qualificar.setText(getString(R.string.gostou_do_nosso_app));
         textViewDailyVerse = findViewById(R.id.textViewDailyVerse);
         textViewDailyVerse.setGravity(Gravity.CENTER);
+        frameLayout = findViewById(R.id.frame_layout_man);
 
 
         button_sermon.setText(getString(R.string.devocional));
@@ -329,10 +332,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void selectBibleVersion() {
 
-        final FrameLayout frameLayout = findViewById(R.id.frame_layout_man);
-        final LinearLayout linearLayout = new LinearLayout(getApplicationContext());
 
-        final Spinner spinner = new Spinner(getApplicationContext());
+        final Spinner spinner = new Spinner(new ContextThemeWrapper(MainActivity.this,android.R.style.Theme_Material));
         spinner.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         String[] versoes = getResources().getStringArray(R.array.versoes);
@@ -349,56 +350,40 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
+        int i = Integer.valueOf(sharedPrefDataBasePatch.getString("version","0"));
+
+        spinner.setAdapter(arrayAdapter);
+        spinner.setSelection(i);
+
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT);
         params.setMargins(20, 0, 20, 20);
-        spinner.setAdapter(arrayAdapter);
+
         Button buttonGo = new Button(getApplicationContext());
         buttonGo.setLayoutParams(params);
         buttonGo.setText("Confirmar");
+
+        Button buttonExit = new Button(getApplicationContext());
+        buttonExit.setLayoutParams(params);
+        buttonExit.setText("Cancelar");
 
         buttonGo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
 
-                if (isDataBaseDownload(getApplicationContext(), String.valueOf(spinner.getSelectedItemId()))) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                    builder.setTitle("ATENÇÂO");
-                    builder.setMessage("A versão escolhida já foi baixada. Se baixar novamente a mesma versão os dados" +
-                            " serão apagados. Você perderá seus textos favoritos e textos lidos.");
-                    builder.setPositiveButton("Baixar novamente", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            editor = sharedPrefDataBasePatch.edit();
-                            editor.putString("version", String.valueOf(spinner.getSelectedItemId())).commit();
-                            editor.putString("versionName", spinner.getSelectedItem().toString()).commit();
-                            if (frameLayout != null)
-                                if (linearLayout != null)
-                                    frameLayout.removeView(linearLayout);
-
-                            downloadDataBaseBible(String.valueOf(spinner.getSelectedItemId()));
-
-
-                        }
-                    });
-                    builder.setNegativeButton("Usar versão baixada", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            sharedPrefDataBasePatch.edit().putString("version", String.valueOf(spinner.getSelectedItemId())).commit();
-                            String[] versions = getResources().getStringArray(R.array.versoes);
-                            int i = (int) spinner.getSelectedItemId();
-                            sharedPrefDataBasePatch.edit().putString("versionName", versions[i]).commit();
-                            textViewTextBibleVersion.setText(versions[i]);
-                            if (frameLayout != null)
-                                if (linearLayout != null)
-                                    frameLayout.removeView(linearLayout);
-                        }
-                    });
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-                } else {
+            if (isDataBaseDownload(getApplicationContext(), String.valueOf(spinner.getSelectedItemId()))) {
+                    sharedPrefDataBasePatch.edit().putString("version", String.valueOf(spinner.getSelectedItemId())).commit();
+                    String[] versions = getResources().getStringArray(R.array.versoes);
+                    int i = (int) spinner.getSelectedItemId();
+                    sharedPrefDataBasePatch.edit().putString("versionName", versions[i]).commit();
+                    textViewTextBibleVersion.setText(versions[i]);
                     if (frameLayout != null)
                         if (linearLayout != null)
                             frameLayout.removeView(linearLayout);
+
+                } else {
+
                     downloadDataBaseBible(String.valueOf(spinner.getSelectedItemId()));
 
                 }
@@ -409,32 +394,64 @@ public class MainActivity extends AppCompatActivity {
 
         });
 
+        buttonExit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (linearLayout != null) {
+                    ViewGroup parent = (ViewGroup) linearLayout.getParent();
+
+                    if (parent != null) {
+                        parent.removeView(linearLayout);
+                        linearLayout = null;
+                    }
+                }
+
+            }
+        });
+
 
         TextView textView = new TextView(getApplicationContext());
-        textView.setTextColor(Color.WHITE);
+        textView.setTextColor(Color.BLACK);
         textView.setTextSize(18);
         textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-        params.setMargins(20, 0, 20, 20);
+        params.setMargins(20, 20, 20, 20);
         textView.setLayoutParams(params);
-        textView.setText(R.string.finished_install);
+        textView.setText(R.string.aviso_escolha_book);
 
-
+        linearLayout = new LinearLayout(new ContextThemeWrapper(MainActivity.this,android.R.style.Theme_Material));
+        linearLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         linearLayout.setGravity(Gravity.CENTER);
         linearLayout.setBackgroundColor(getResources().getColor(R.color.blue));
-        params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-        linearLayout.setLayoutParams(params);
+
+        LinearLayout containerButton = new LinearLayout(getApplicationContext());
+        containerButton.setOrientation(LinearLayout.HORIZONTAL);
+        containerButton.setGravity(Gravity.CENTER);
+        containerButton.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        containerButton.addView(buttonExit);
+        containerButton.addView(buttonGo);
+
         linearLayout.addView(textView);
         linearLayout.addView(spinner);
-        linearLayout.addView(buttonGo);
-
+        linearLayout.addView(containerButton);
         frameLayout.addView(linearLayout);
 
     }
 
     private void runDownloadFromDownloadTask(String version) {
 
+        if (linearLayout != null) {
+            ViewGroup parent = (ViewGroup) linearLayout.getParent();
+
+            if (parent != null) {
+                parent.removeView(linearLayout);
+                linearLayout = null;
+            }
+        }
+
         if (isNetworkAvailable(this)) {
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -448,7 +465,7 @@ public class MainActivity extends AppCompatActivity {
                 params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT);
                 TextView textView = new TextView(getApplicationContext());
-                textView.setTextColor(Color.WHITE);
+                textView.setTextColor(Color.BLACK);
                 textView.setTextSize(16);
                 textView.setJustificationMode(Layout.JUSTIFICATION_MODE_INTER_WORD);
                 params.setMargins(20, 0, 20, 20);
@@ -457,20 +474,18 @@ public class MainActivity extends AppCompatActivity {
                 String smg = "<font color='red'>" + getString(R.string.app_name) + "</font>";
                 smg = smg.concat("<br>" + getString(R.string.finished_install));
                 textView.setText(Html.fromHtml(smg, Html.FROM_HTML_MODE_LEGACY));
-
                 LinearLayout linearLayout = new LinearLayout(getApplicationContext());
                 linearLayout.setOrientation(LinearLayout.VERTICAL);
                 linearLayout.setGravity(Gravity.CENTER);
-                linearLayout.setBackgroundColor(Color.BLACK);
+                linearLayout.setBackgroundColor(Color.WHITE);
                 params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
                 linearLayout.setLayoutParams(params);
                 linearLayout.addView(textView);
                 linearLayout.addView(progressBar);
-                FrameLayout frameLayout = findViewById(R.id.frame_layout_man);
                 frameLayout.addView(linearLayout);
 
-                new DownloadTask(textViewTextBibleVersion,version, getApplicationContext(), progressBar, frameLayout, linearLayout, sharedPrefDataBasePatch);
+                new DownloadTask(textViewTextBibleVersion, version, getApplicationContext(), progressBar, frameLayout, linearLayout, sharedPrefDataBasePatch);
 
             } else {
                 progressDialog = new ProgressDialog(MainActivity.this, R.style.ProgressBarStyle);
@@ -478,18 +493,18 @@ public class MainActivity extends AppCompatActivity {
                 progressDialog.setMessage(getString(R.string.finished_install));
                 progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
                 progressDialog.setProgressNumberFormat(null);
-                progressDialog.setCancelable(false);
+                progressDialog.setCancelable(true);
                 progressDialog.setMax(100);
                 progressDialog.show();
 
-                new DownloadTask(textViewTextBibleVersion,version, getApplicationContext(), progressDialog, sharedPrefDataBasePatch);
+                new DownloadTask(textViewTextBibleVersion, version, getApplicationContext(), progressDialog, sharedPrefDataBasePatch);
             }
         } else {
             Toast.makeText(getApplicationContext(), R.string.sem_conexao, Toast.LENGTH_LONG).show();
         }
     }
 
-    private void downloadDataBaseBible(String version) {
+    private void downloadDataBaseBible(final String version) {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
@@ -501,37 +516,28 @@ public class MainActivity extends AppCompatActivity {
                         .setTitle(R.string.title_permission);
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-               /*
-                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                        Manifest.permission.ACCESS_NOTIFICATION_POLICY}, REQUEST_STORAGE);
-                            Intent i = getBaseContext().getPackageManager().
-                                    getLaunchIntentForPackage(getBaseContext().getPackageName());
-                            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            i.addFlags(FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(i);
-                            finish();*/
-                        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_NOTIFICATION_POLICY}, REQUEST_STORAGE);
+               ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_NOTIFICATION_POLICY}, REQUEST_STORAGE);
 
                     }
                 });
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        finish();
+
                     }
                 });
-
                 builder.show();
+            }else{
 
-            } else {
-                runDownloadFromDownloadTask(version);
+             runDownloadFromDownloadTask(version);
             }
+
         } else {
 
             runDownloadFromDownloadTask(version);
+
+
         }
-
-
     }
 
     static public boolean isDataBaseDownload(Context context, String version) {
@@ -639,19 +645,19 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == REQUEST_STORAGE) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                if (!isDataBaseDownload(getApplicationContext(), getSharedPreferences("DataBase", MODE_PRIVATE).getString("version", " "))) {
-                    if (isNetworkAvailable(this)) {
-                        selectBibleVersion();
-                    } else {
-                        Toast.makeText(getApplicationContext(), R.string.not_internet_avaliable, Toast.LENGTH_LONG).show();
-                    }
-                }
+
+                Toast.makeText(getApplicationContext(),"Permissão concedida com sucesso.", Toast.LENGTH_LONG).show();
+                finish();
+                startActivity(new Intent(MainActivity.this,MainActivity.class));
+
             } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
                 if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)
                         || ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         || ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.ACCESS_NOTIFICATION_POLICY)
                 ) {
-                    selectBibleVersion();
+
+                    Toast.makeText(getApplicationContext(),"O aplicativo não tem permissão para criar o banco de dados.", Toast.LENGTH_LONG).show();
+
                 }
             }
         }
@@ -1013,7 +1019,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onBackPressed() {
-        super.onBackPressed();
+
+        if (linearLayout != null) {
+            ViewGroup parent = (ViewGroup) linearLayout.getParent();
+
+            if (parent != null) {
+                parent.removeView(linearLayout);
+                linearLayout = null;
+            }
+        }else {
+            super.onBackPressed();
+        }
+
         return;
     }
 
@@ -1050,18 +1067,8 @@ public class MainActivity extends AppCompatActivity {
         // Handle action buttons
         switch (item.getItemId()) {
             case R.id.action_websearch:
-                // create intent to perform web search for this planet
-                // Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
-                // intent.putExtra(SearchManager.QUERY, getActionBar().getTitle());
-                // catch event that there's no activity to handle intent
-
-                Intent intent1 = new Intent();
-                intent1.setClass(getApplication(), Activity_busca_avancada.class);
-
-                if (intent1.resolveActivity(getPackageManager()) != null) {
-                    startActivity(intent1);
-                } else {
-                    Toast.makeText(this, R.string.app_not_available, Toast.LENGTH_LONG).show();
+                if (isDataBaseDownload(getApplicationContext(), getSharedPreferences("DataBase", MODE_PRIVATE).getString("version", " "))) {
+                    startActivity(new Intent(MainActivity.this, Activity_busca_avancada.class));
                 }
                 return true;
             default:

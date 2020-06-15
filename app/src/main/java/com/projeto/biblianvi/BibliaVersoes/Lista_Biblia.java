@@ -7,7 +7,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -74,6 +73,7 @@ public class Lista_Biblia extends Activity {
     private CharSequence mTitle;
     private String[] menuTitulos;
     private BibliaBancoDadosHelper bibliaHelp;
+    private DBAdapterFavoritoNota dbAdapterFavoritoNota;
     private List<Biblia> lista = null;
     private TextView textViewCap;
     private TextView textViewLivro;
@@ -132,6 +132,7 @@ public class Lista_Biblia extends Activity {
 
         setContentView(R.layout.activity_list_view);
         bibliaHelp = new BibliaBancoDadosHelper(getApplicationContext());
+        dbAdapterFavoritoNota = new DBAdapterFavoritoNota(getApplicationContext());
 
         textViewComp = findViewById(R.id.textViewComp);
         textViewCap = findViewById(R.id.textViewCapit);
@@ -449,22 +450,9 @@ public class Lista_Biblia extends Activity {
         favo.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View v) {
-
-           BibliaBancoDadosHelper h = new BibliaBancoDadosHelper(Lista_Biblia.this);
-
-           if(h.tabelaExiste(Activity_favorito.TABELANAME) != 0){
-
-
-               h.setFavorito(bi.getIdVerse());
-
-
-           } else{
-
-               h.criarTabela(Activity_favorito.TABELANAME,Activity_favorito.CAMPOS);
-
-               h.setFavorito(bi.getIdVerse());
-
-           }
+             dbAdapterFavoritoNota.open();
+             dbAdapterFavoritoNota.insertFavorite(bi.getChapter(),bi.getVersesNum(),bi.getText(),bi.getBookVersion(),bi.getBooksName());
+             dbAdapterFavoritoNota.close();
 
              pw.dismiss();
 

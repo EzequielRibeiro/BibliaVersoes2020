@@ -2,6 +2,7 @@ package com.projeto.biblianvi.BibliaVersoes;
 
 
 import android.app.Activity;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -17,17 +18,17 @@ import java.util.Date;
 
 public class ActivityAnotacao extends Activity {
 
-
-    static public ArrayList<Anotacao> LISTA;
-    static public NotaAdaptador NOTAADAPTADOR;
+    static public NotaAdaptador notaAdaptador;
+    static public ArrayList<Anotacao> notas;
     private ListView listView;
     private LinearLayout layoutNotaAdcionar;
-    private BibliaBancoDadosHelper bibliaBancoDadosHelper;
+    private DBAdapterFavoritoNota dbAdapterFavoritoNota;
     Button buttonNotaSalvar;
     Button buttonNotaCancel;
     EditText editTextTittuloNota, editTextNotaTexto;
     FrameLayout item;
     View child;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +37,10 @@ public class ActivityAnotacao extends Activity {
 
         listView = findViewById(R.id.listNota);
         layoutNotaAdcionar = findViewById(R.id.layoutNotaAdcionar);
+        dbAdapterFavoritoNota = new DBAdapterFavoritoNota(getApplicationContext());
 
+
+        carregarLista();
 
        layoutNotaAdcionar.setOnClickListener(new View.OnClickListener()
         {
@@ -45,8 +49,8 @@ public class ActivityAnotacao extends Activity {
         public void onClick (View v){
 
             item = findViewById(R.id.frameNota);
-        child = getLayoutInflater().inflate(R.layout.nota_adicionar, null);
-        item.addView(child);
+            child = getLayoutInflater().inflate(R.layout.nota_adicionar, null);
+            item.addView(child);
 
             buttonNotaSalvar = findViewById(R.id.buttonNotaSalvar);
             buttonNotaCancel = findViewById(R.id.buttonNotaCancel);
@@ -78,15 +82,19 @@ public class ActivityAnotacao extends Activity {
 
                 if (titulo.length() > 1 || texto.length() > 1) {
 
-                    bibliaBancoDadosHelper = new BibliaBancoDadosHelper(getApplicationContext());
-                    bibliaBancoDadosHelper.salvarNota(titulo, texto, data);
-
-
-                    Toast.makeText(getApplicationContext(), "Nota salva!", Toast.LENGTH_LONG).show();
-
+                    dbAdapterFavoritoNota.open();
+                    long id = dbAdapterFavoritoNota.insertNota(titulo, texto, data);
+                    dbAdapterFavoritoNota.close();
+                    Anotacao anotacao = new Anotacao();
+                    anotacao.setId((int)id);
+                    anotacao.setTitulo(titulo);
+                    anotacao.setTexto(texto);
+                    anotacao.setData(data);
+                    notas.add(anotacao);
+                    notaAdaptador.notifyDataSetChanged();
                     item.removeView(child);
 
-                    carregarLista();
+                    Toast.makeText(getApplicationContext(), "Nota salva!", Toast.LENGTH_LONG).show();
 
                 } else {
 
@@ -115,27 +123,37 @@ public class ActivityAnotacao extends Activity {
 
     private void carregarLista() {
 
+        notas = new ArrayList<Anotacao>();
+        Cursor cursor;
+        dbAdapterFavoritoNota.open();
+        cursor = dbAdapterFavoritoNota.getAllValuesNota();
 
-        LISTA = new BibliaBancoDadosHelper(ActivityAnotacao.this).getNota();
-
-        if (!LISTA.isEmpty()) {
-
-            NOTAADAPTADOR = new NotaAdaptador(getApplicationContext(),this, LISTA);
-
-            listView.setAdapter(NOTAADAPTADOR);
-
-
-        } else {
-
-           LISTA.add(new Anotacao());
-
-            NOTAADAPTADOR = new NotaAdaptador(getApplicationContext(),this ,LISTA);
-
-            listView.setAdapter(NOTAADAPTADOR);
-
+        Anotacao anotacao;
+        if (cursor.moveToFirst()) {
+            do {
+                anotacao = new Anotacao();
+                anotacao.setId(cursor.getInt(0));
+                anotacao.setTitulo(cursor.getString(1));
+                anotacao.setTexto(cursor.getString(2));
+                anotacao.setData(cursor.getString(3));
+                notas.add(anotacao);
+            } while (cursor.moveToNext());
         }
 
+        dbAdapterFavoritoNota.close();
+        notaAdaptador = new NotaAdaptador(getApplicationContext(),this, notas);
+        listView.setAdapter(notaAdaptador);
 
+        if (notas.isEmpty()) {
+            Toast.makeText(getApplicationContext(),"Você não tem anotações até o momento.",Toast.LENGTH_LONG).show();
+        }
+
+    }
+
+    public void onDestroy(){
+        super.onDestroy();
+        if(notas != null)
+            notas.clear();
     }
 
 }
