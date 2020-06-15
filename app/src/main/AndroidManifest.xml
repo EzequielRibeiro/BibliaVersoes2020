@@ -61,10 +61,7 @@
             android:name=".Sermoes"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_mensagem" />
-        <activity
-            android:name="com.google.android.gms.ads.AdActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
-            android:theme="@android:style/Theme.Translucent" />
+ 
         <activity android:name=".Grafico_Um" />
         <activity android:name=".Grafico_Dois" />
         <activity
