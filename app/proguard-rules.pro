@@ -18,6 +18,6 @@
 -dontwarn org.conscrypt.ConscryptHostnameVerifier
 
 -dontwarn com.amazon.**
--keep class com.amazon.** {*;}
--keepattributes *Annotation*
--optimizationpasses 1
+#-keep class com.amazon.** {*;}
+#-keepattributes *Annotation*
+#-optimizationpasses 1
